@@ -515,7 +515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_CameraAnchor: {fileID: 1508438726}
-  m_MovementTorque: 25
-  m_MovementTorquePerDebris: .5
+  m_MovementTorqueBase: 25
+  m_MovementTorquePerDebris: 1
   m_SphereAbsorption: 1
   m_SphereExpansion: 2
