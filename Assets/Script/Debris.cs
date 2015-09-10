@@ -5,19 +5,31 @@ using System.Collections;
 public class Debris : MonoBehaviour
 {
     Light m_Light;
+    Renderer m_Renderer;
 
     void Awake()
     {
         m_Light = GetComponent<Light>();
         Assert.IsNotNull(m_Light);
+
+        m_Renderer = GetComponent<Renderer>();
+        Assert.IsNotNull(m_Renderer);
     }
 
     public void SetColor(float H)
     {
+        Color color = HSVToRGB(H, 1f, 1f);
+
         Assert.IsNotNull(m_Light);
         if (m_Light)
         {
-            m_Light.color = HSVToRGB(H, 1f, 1f);
+            m_Light.color = color;
+        }
+
+        Assert.IsNotNull(m_Renderer);
+        if (m_Renderer)
+        {
+            m_Renderer.material.color = color;
         }
     }
 
