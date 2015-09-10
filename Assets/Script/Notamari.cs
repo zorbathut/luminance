@@ -6,7 +6,7 @@ public class Notamari : MonoBehaviour
 {
     public Transform m_CameraAnchor;
 
-    public float m_MovementForce = 10f;
+    public float m_MovementTorque = 10f;
 
     Rigidbody m_RigidBody;
 
@@ -41,7 +41,7 @@ public class Notamari : MonoBehaviour
 
     void FixedUpdate()
     {
-        m_RigidBody.AddForce(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * m_MovementForce);
+        m_RigidBody.AddTorque(new Vector3(Input.GetAxis("Vertical"), 0, -Input.GetAxis("Horizontal")) * m_MovementTorque);
     }
 
     void Update()

@@ -515,4 +515,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_CameraAnchor: {fileID: 1508438726}
-  m_MovementForce: 20
+  m_MovementTorque: 25
