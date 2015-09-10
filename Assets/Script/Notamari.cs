@@ -7,10 +7,15 @@ public class Notamari : MonoBehaviour
     public Transform m_CameraAnchor;
 
     public float m_MovementTorque = 10f;
+    public float m_MovementTorquePerDebris = 0.5f;
     public float m_SphereAbsorption = 2f;
     public float m_SphereExpansion = 2f;
 
     Rigidbody m_RigidBody;
+    Renderer m_Renderer;
+
+    int m_DebrisAttached;
+    int m_DebrisTotal = 0;
 
     void Start()
     {
@@ -18,6 +23,12 @@ public class Notamari : MonoBehaviour
 
         m_RigidBody = GetComponent<Rigidbody>();
         Assert.IsNotNull(m_RigidBody);
+
+        m_Renderer = GetComponent<Renderer>();
+        Assert.IsNotNull(m_Renderer);
+
+        // this is not an elegant solution; it is a one-line solution
+        m_DebrisTotal = FindObjectsOfType<Debris>().Length;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -26,6 +37,8 @@ public class Notamari : MonoBehaviour
         if (debris && debris.transform.parent != transform)
         {
             Debug.Log("Collided with debris!");
+
+            ++m_DebrisAttached;
 
             // Wipe the debris' rigid body so it becomes part of us
             Destroy(debris.GetComponent<Rigidbody>());
@@ -55,9 +68,14 @@ public class Notamari : MonoBehaviour
                 // There is probably a faster way to do this but whatever there's like fifty pieces of debris per level at most
             }
 
-            // Yay!
+            // Update our visible look
+            if (m_Renderer)
+            {
+                m_Renderer.material.SetFloat("_ClipThreshold", 1 - m_DebrisAttached / (float)m_DebrisTotal);
+            }
 
-            // YAY.
+            // Update our physics; without this, it gets really hard to move
+            m_MovementTorque = m_MovementTorque + m_MovementTorquePerDebris;
         }
     }
 
