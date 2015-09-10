@@ -41,8 +41,17 @@ public class Spawner : MonoBehaviour
                 }
 
                 // Place it there
-                Instantiate(m_Debris, hitInfo.point + Vector3.up * groundOffset, Random.rotationUniform);
+                Debris debris = ((Transform)Instantiate(m_Debris, hitInfo.point + Vector3.up * groundOffset, Random.rotationUniform)).GetComponent<Debris>();
                 ++spawned;
+
+                // Set up colors
+                Assert.IsNotNull(debris);
+                if (!debris)    // test after we increment spawned, just so we don't end up creating literally thousands of objects if this fails
+                {
+                    continue;
+                }
+
+                debris.SetColor(Random.Range(0f, 1f));
             }
 
             Assert.IsTrue(emergencyEscape < emergencyEscapeThreshold);
