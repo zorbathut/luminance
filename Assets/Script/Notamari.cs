@@ -28,7 +28,7 @@ public class Notamari : MonoBehaviour
         if (m_CameraAnchor)
         {
             // Move the camera along with the sphere; it's not a child of the sphere so we don't have to muck about with undoing rotations
-            m_CameraAnchor.transform.position = transform.position;
+            m_CameraAnchor.transform.position = new Vector3(transform.position.x, 0f, transform.position.y);
         }
         
     }
