@@ -17,7 +17,28 @@ public class Notamari : MonoBehaviour
         m_RigidBody = GetComponent<Rigidbody>();
         Assert.IsNotNull(m_RigidBody);
     }
-        
+
+    void OnCollisionEnter(Collision collision)
+    {
+        Debris debris = collision.gameObject.GetComponent<Debris>();
+        if (debris)
+        {
+            Debug.Log("Collided with debris!");
+
+            // Wipe the debris' rigid body so it becomes part of us
+            Destroy(collision.gameObject.GetComponent<Rigidbody>());
+
+            // Make it a child of us
+            collision.gameObject.transform.SetParent(transform);
+
+            // Now it's hard to move around!
+
+            // Yay!
+
+            // YAY.
+        }
+    }
+
     void FixedUpdate()
     {
         m_RigidBody.AddForce(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * m_MovementForce);
