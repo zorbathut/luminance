@@ -30,6 +30,11 @@ public class Debris : MonoBehaviour
         SetIntensity(1);
     }
 
+    public Color GetBaseColor()
+    {
+        return m_BaseColor;
+    }
+
     public void SetIntensity(float intensity)
     {
         Assert.IsNotNull(m_Light);

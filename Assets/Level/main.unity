@@ -87,6 +87,10 @@ NavMeshSettings:
     cellSize: .166666672
     manualCellSize: 0
   m_NavMeshData: {fileID: 0}
+--- !u!4 &532412669 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+  m_PrefabInternal: {fileID: 897431647}
 --- !u!1 &766422897
 GameObject:
   m_ObjectHideFlags: 0
@@ -147,8 +151,81 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66a426aa0a5a0094f821a7bacd9d9adf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Spawns: 50
+  m_Spawns: 30
   m_Debris: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+--- !u!1001 &897431647
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1522939749}
+    m_Modifications:
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 153038, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_Name
+      value: Lightsource
+      objectReference: {fileID: 0}
+    - target: {fileID: 10888890, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_Range
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 10888890, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_Shadows.m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_LocalScale.x
+      value: .5
+      objectReference: {fileID: 0}
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_LocalScale.y
+      value: .5
+      objectReference: {fileID: 0}
+    - target: {fileID: 412560, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_LocalScale.z
+      value: .5
+      objectReference: {fileID: 0}
+    - target: {fileID: 10888890, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+      propertyPath: m_Intensity
+      value: 8
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 13515352, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+    - {fileID: 5435552, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+    - {fileID: 11456874, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+  m_ParentPrefab: {fileID: 100100000, guid: 487bf86c8be7bb74eb1d01796675d35c, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &928747633
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,7 +577,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 532412669}
   m_Father: {fileID: 0}
   m_RootOrder: 2
 --- !u!114 &1522939750
@@ -515,7 +593,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_CameraAnchor: {fileID: 1508438726}
+  m_CentralLightsource: {fileID: 532412669}
   m_MovementTorqueBase: 25
   m_MovementTorquePerDebris: 1
   m_SphereAbsorption: 1
   m_SphereExpansion: 2
+  m_CollectedPctPower: .5
+  m_VisualsLerp: .0500000007

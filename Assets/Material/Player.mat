@@ -34,7 +34,7 @@ Material:
       data:
         first:
           name: _ClipThreshold
-        second: 1
+        second: .0410000011
     m_Colors:
       data:
         first:

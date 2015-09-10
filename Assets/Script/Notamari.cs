@@ -5,11 +5,14 @@ using System.Collections.Generic;
 public class Notamari : MonoBehaviour
 {
     public Transform m_CameraAnchor;
+    public Transform m_CentralLightsource;
 
     public float m_MovementTorqueBase = 10f;
     public float m_MovementTorquePerDebris = 0.5f;
     public float m_SphereAbsorption = 2f;
     public float m_SphereExpansion = 2f;
+    public float m_CollectedPctPower = 0.5f;
+    public float m_VisualsLerp = 0.05f;
 
     float m_MovementTorque;
 
@@ -17,6 +20,8 @@ public class Notamari : MonoBehaviour
     Renderer m_Renderer;
 
     int m_DebrisTotal = 0;
+    float m_LastCollectedPct = 0;
+    Color m_LastDebrisColor = new Color();
 
     List<Debris> m_Children = new List<Debris>();
 
@@ -30,10 +35,12 @@ public class Notamari : MonoBehaviour
         m_Renderer = GetComponent<Renderer>();
         Assert.IsNotNull(m_Renderer);
 
-        // this is not an elegant solution; it is a one-line solution
+        // this is not an elegant solution; it is a one-line and functional solution
         m_DebrisTotal = FindObjectsOfType<Debris>().Length;
 
         m_MovementTorque = m_MovementTorqueBase;
+
+        SyncDebrisProperties();
     }
 
     void OnCollisionEnter(Collision collision)
@@ -70,8 +77,6 @@ public class Notamari : MonoBehaviour
 
                 // There is probably a faster way to do this but whatever there's like fifty pieces of debris per level at most
             }
-
-            SyncDebrisProperties();
         }
     }
 
@@ -79,26 +84,74 @@ public class Notamari : MonoBehaviour
     void SyncDebrisProperties()
     {
         float collectedPct = m_Children.Count / (float)m_DebrisTotal;
+        collectedPct = Mathf.Pow(collectedPct, m_CollectedPctPower);
+
+        m_LastCollectedPct = Mathf.Lerp(m_LastCollectedPct, collectedPct, m_VisualsLerp);
 
         // Update our visible look
         if (m_Renderer)
         {
-            m_Renderer.material.SetFloat("_ClipThreshold", 1 - collectedPct);
+            m_Renderer.material.SetFloat("_ClipThreshold", 1 - m_LastCollectedPct);
         }
 
         // Update our physics; without this, it gets really hard to move
         m_MovementTorque = m_MovementTorqueBase + m_MovementTorquePerDebris * m_Children.Count;
 
-        // Update children
+        // Update children and accumulate lighting
+        // The accumulated lighting snaps to the new color, and it probably shouldn't, but it's not likely to be visible
+        Color debrisColor = new Color();
         foreach (Debris debris in m_Children)
         {
-            debris.SetIntensity(1 - collectedPct);
+            debris.SetIntensity(1 - m_LastCollectedPct);
+            debrisColor += debris.GetBaseColor();
+        }
+        if (m_Children.Count > 0)
+        {
+            debrisColor /= m_Children.Count;
+        }
+        else
+        {
+            debrisColor = new Color();
+        }
+        debrisColor *= m_LastCollectedPct;
+        m_LastDebrisColor = Color.Lerp(m_LastDebrisColor, debrisColor, m_VisualsLerp);
+
+        // Update central lightsource
+        Assert.IsNotNull(m_CentralLightsource);
+        if (m_CentralLightsource)
+        {
+            Light light = m_CentralLightsource.GetComponent<Light>();
+            Renderer renderer = m_CentralLightsource.GetComponent<Renderer>();
+
+            Assert.IsNotNull(light);
+            if (light)
+            {
+                light.color = m_LastDebrisColor;
+            }
+
+            Assert.IsNotNull(renderer);
+            if (renderer)
+            {
+                renderer.material.SetColor("_TintColor", m_LastDebrisColor);
+            }
+        }
+
+        // Finally, if we've collected everything, get rid of all our child colliders so the sphere runs smoothly
+        if (m_Children.Count == m_DebrisTotal)
+        {
+            foreach (Debris debris in m_Children)
+            {
+                Destroy(debris.GetComponent<Collider>());
+            }
         }
     }
 
     void FixedUpdate()
     {
         m_RigidBody.AddTorque(new Vector3(Input.GetAxis("Vertical"), 0, -Input.GetAxis("Horizontal")) * m_MovementTorque);
+
+        // Technically this should be in Update(), but then the math to make the lerp work properly is a lot more difficult, and nobody will notice it *only* updating at 60fps
+        SyncDebrisProperties();
     }
 
     void Update()
@@ -108,6 +161,5 @@ public class Notamari : MonoBehaviour
             // Move the camera along with the sphere; it's not a child of the sphere so we don't have to muck about with undoing rotations
             m_CameraAnchor.transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
         }
-        
     }
 }
