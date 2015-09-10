@@ -7,10 +7,17 @@ public class Debris : MonoBehaviour
     Light m_Light;
     Renderer m_Renderer;
 
+    Color m_BaseColor;
+    float m_BaseIntensity;
+
     void Awake()
     {
         m_Light = GetComponent<Light>();
         Assert.IsNotNull(m_Light);
+        if (m_Light)
+        {
+            m_BaseIntensity = m_Light.intensity;
+        }
 
         m_Renderer = GetComponent<Renderer>();
         Assert.IsNotNull(m_Renderer);
@@ -18,18 +25,24 @@ public class Debris : MonoBehaviour
 
     public void SetColor(float H)
     {
-        Color color = HSVToRGB(H, 1f, 1f);
+        m_BaseColor = HSVToRGB(H, 1f, 1f);
 
+        SetIntensity(1);
+    }
+
+    public void SetIntensity(float intensity)
+    {
         Assert.IsNotNull(m_Light);
         if (m_Light)
         {
-            m_Light.color = color;
+            m_Light.color = m_BaseColor;
+            m_Light.intensity = m_BaseIntensity * intensity;
         }
 
         Assert.IsNotNull(m_Renderer);
         if (m_Renderer)
         {
-            m_Renderer.material.color = color;
+            m_Renderer.material.SetColor("_TintColor", m_BaseColor * intensity);
         }
     }
 

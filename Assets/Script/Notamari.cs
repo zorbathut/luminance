@@ -1,21 +1,24 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
-using System.Collections;
+using System.Collections.Generic;
 
 public class Notamari : MonoBehaviour
 {
     public Transform m_CameraAnchor;
 
-    public float m_MovementTorque = 10f;
+    public float m_MovementTorqueBase = 10f;
     public float m_MovementTorquePerDebris = 0.5f;
     public float m_SphereAbsorption = 2f;
     public float m_SphereExpansion = 2f;
 
+    float m_MovementTorque;
+
     Rigidbody m_RigidBody;
     Renderer m_Renderer;
 
-    int m_DebrisAttached;
     int m_DebrisTotal = 0;
+
+    List<Debris> m_Children = new List<Debris>();
 
     void Start()
     {
@@ -29,6 +32,8 @@ public class Notamari : MonoBehaviour
 
         // this is not an elegant solution; it is a one-line solution
         m_DebrisTotal = FindObjectsOfType<Debris>().Length;
+
+        m_MovementTorque = m_MovementTorqueBase;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -36,9 +41,7 @@ public class Notamari : MonoBehaviour
         Debris debris = collision.gameObject.GetComponent<Debris>();
         if (debris && debris.transform.parent != transform)
         {
-            Debug.Log("Collided with debris!");
-
-            ++m_DebrisAttached;
+            m_Children.Add(debris);
 
             // Wipe the debris' rigid body so it becomes part of us
             Destroy(debris.GetComponent<Rigidbody>());
@@ -68,14 +71,28 @@ public class Notamari : MonoBehaviour
                 // There is probably a faster way to do this but whatever there's like fifty pieces of debris per level at most
             }
 
-            // Update our visible look
-            if (m_Renderer)
-            {
-                m_Renderer.material.SetFloat("_ClipThreshold", 1 - m_DebrisAttached / (float)m_DebrisTotal);
-            }
+            SyncDebrisProperties();
+        }
+    }
 
-            // Update our physics; without this, it gets really hard to move
-            m_MovementTorque = m_MovementTorque + m_MovementTorquePerDebris;
+    // Called whenever children count changes
+    void SyncDebrisProperties()
+    {
+        float collectedPct = m_Children.Count / (float)m_DebrisTotal;
+
+        // Update our visible look
+        if (m_Renderer)
+        {
+            m_Renderer.material.SetFloat("_ClipThreshold", 1 - collectedPct);
+        }
+
+        // Update our physics; without this, it gets really hard to move
+        m_MovementTorque = m_MovementTorqueBase + m_MovementTorquePerDebris * m_Children.Count;
+
+        // Update children
+        foreach (Debris debris in m_Children)
+        {
+            debris.SetIntensity(1 - collectedPct);
         }
     }
 
