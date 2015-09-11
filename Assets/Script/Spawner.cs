@@ -5,7 +5,7 @@ using System.Collections;
 public class Spawner : MonoBehaviour
 {
     public int m_Spawns;
-    public float m_CenterHole;
+    public float m_CenterHole;  // prevents debris from spawning literally on the player; want to make sure picking up the first one is a conscious movement
 
     public Transform m_Debris;
 

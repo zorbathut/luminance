@@ -18,6 +18,8 @@ public class PhaseManager : MonoBehaviour
     public Text m_SuccessText;
     public Text m_ContinueText;
 
+    public Transform m_Shatter;
+
     int m_DebrisTotal = 0;
     bool m_AllowRestart = false;
 
@@ -47,13 +49,7 @@ public class PhaseManager : MonoBehaviour
         if (m_Chain)
         {
             // Destroy all colliders that are involved in this phase
-            foreach (Collider collider in transform.parent.GetComponentsInChildren<Collider>())
-            {
-                if (!collider.isTrigger)
-                {
-                    Destroy(collider.gameObject);
-                }
-            }
+            ShatterWorld(false);
 
             // Clear the notamari
             notamari.Empty();
@@ -63,6 +59,8 @@ public class PhaseManager : MonoBehaviour
         }
         else
         {
+            ShatterWorld(true);
+
             StartCoroutine(EndGameCutscene());
         }
     }
@@ -100,10 +98,25 @@ public class PhaseManager : MonoBehaviour
             Application.LoadLevel(Application.loadedLevel);
         }
     }
+
     //////////////////
     // Cutscenes
     //
 
+    void ShatterWorld(bool keepColliders)
+    {
+        foreach (Collider collider in transform.parent.GetComponentsInChildren<Collider>())
+        {
+            if (!keepColliders && !collider.isTrigger)
+            {
+                Destroy(collider);
+            }
+
+            Destroy(collider.GetComponent<Renderer>());
+        }
+
+    }
+        
     float Intensify(float value, float power)
     {
         // this is basically Mathf.Pow, except it leaves the sign alone
