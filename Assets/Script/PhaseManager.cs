@@ -5,6 +5,7 @@ using UnityStandardAssets.ImageEffects;
 using System.Collections;
 using System.Collections.Generic;
 
+// This is kind of the "level" manager - each section is handled mostly independently. It's not really "level" because that has its own meaning in Unity, though, so I kinda had to invent a term.
 public class PhaseManager : MonoBehaviour
 {
     public List<Spawner> m_Spawners;
@@ -41,10 +42,23 @@ public class PhaseManager : MonoBehaviour
         }
     }
 
-    void EndPhase()
+    void EndPhase(Notamari notamari)
     {
-        Assert.IsNull(m_Chain);
-        if (!m_Chain)
+        if (m_Chain)
+        {
+            // Destroy all colliders that are involved in this phase
+            foreach (Collider collider in transform.parent.GetComponentsInChildren<Collider>())
+            {
+                if (!collider.isTrigger)
+                {
+                    Destroy(collider.gameObject);
+                }
+            }
+
+            // Clear the notamari
+            notamari.Empty();
+        }
+        else
         {
             StartCoroutine(EndGameCutscene());
         }
@@ -59,11 +73,20 @@ public class PhaseManager : MonoBehaviour
         }
     }
 
+    void OnTriggerExit(Collider other)
+    {
+        Notamari notamari = other.GetComponent<Notamari>();
+        if (notamari)
+        {
+            notamari.UnsetPhaseManager(this);
+        }
+    }
+
     public void NotifyGrabbed(Notamari notamari)
     {
         if (notamari.GetDebrisCount() >= m_DebrisTotal)
         {
-            EndPhase();
+            EndPhase(notamari);
         }
     }
 

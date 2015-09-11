@@ -49,6 +49,14 @@ public class Notamari : MonoBehaviour
         SyncDebrisProperties();
     }
 
+    public void UnsetPhaseManager(PhaseManager oldManager)
+    {
+        if (m_CurrentPhase == oldManager)
+        {
+            m_CurrentPhase = null;
+        }
+    }
+
     public int GetDebrisCount()
     {
         return m_Children.Count;
@@ -162,6 +170,15 @@ public class Notamari : MonoBehaviour
         }
     }
 
+    public void Empty()
+    {
+        foreach (Debris debris in m_Children)
+        {
+            Destroy(debris.gameObject);
+        }
+        m_Children.Clear();
+    }
+
     void FixedUpdate()
     {
         m_RigidBody.AddTorque(new Vector3(Input.GetAxis("Vertical"), 0, -Input.GetAxis("Horizontal")) * m_MovementTorque);
@@ -175,7 +192,15 @@ public class Notamari : MonoBehaviour
         if (m_CameraAnchor)
         {
             // Move the camera along with the sphere; it's not a child of the sphere so we don't have to muck about with undoing rotations
-            m_CameraAnchor.transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
+            float targetY = transform.position.y;
+
+            if (m_CurrentPhase)
+            {
+                targetY = m_CurrentPhase.transform.position.y;
+            }
+
+            // this is not the right delta-time behavior, but it's close enough for now
+            m_CameraAnchor.transform.position = new Vector3(transform.position.x, Mathf.Lerp(m_CameraAnchor.transform.position.y, targetY, 1 * Time.deltaTime), transform.position.z);
         }
     }
 }

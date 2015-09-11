@@ -5,6 +5,7 @@ using System.Collections;
 public class Spawner : MonoBehaviour
 {
     public int m_Spawns;
+    public float m_CenterHole;
 
     public Transform m_Debris;
 
@@ -32,6 +33,11 @@ public class Spawner : MonoBehaviour
                     spawnBounds.bounds.max.y,
                     Random.Range(spawnBounds.bounds.min.z, spawnBounds.bounds.max.z)
                 );
+
+                if (position.x * position.x + position.z * position.z < m_CenterHole)
+                {
+                    continue;
+                }
 
                 // Trace down so we find where it should land
                 RaycastHit hitInfo;
