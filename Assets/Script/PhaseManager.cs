@@ -57,6 +57,9 @@ public class PhaseManager : MonoBehaviour
 
             // Clear the notamari
             notamari.Empty();
+
+            // Kick off the next segment
+            m_Chain.BeginPhase();
         }
         else
         {
@@ -113,11 +116,14 @@ public class PhaseManager : MonoBehaviour
         Camera camera = Camera.main;
         ColorCorrectionCurves colorCurves = camera.GetComponent<ColorCorrectionCurves>();
 
+        float preDelayTime = 1f;
         float saturationTime = 3f;
         float saturationDelayTime = 1.2f;
         float successTime = 2f;
         float successDelayTime = 1.2f;
         float continueTime = 2f;
+
+        yield return new WaitForSeconds(preDelayTime);
 
         float startTime = Time.time;
         while (Time.time < startTime + saturationTime)

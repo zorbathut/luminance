@@ -41,7 +41,7 @@ public class Spawner : MonoBehaviour
 
                 // Trace down so we find where it should land
                 RaycastHit hitInfo;
-                if (!Physics.Raycast(position, Vector3.down, out hitInfo))
+                if (!Physics.Raycast(position, Vector3.down * 10, out hitInfo))
                 {
                     continue;
                 }
