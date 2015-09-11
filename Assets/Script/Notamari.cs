@@ -25,6 +25,8 @@ public class Notamari : MonoBehaviour
 
     List<Debris> m_Children = new List<Debris>();
 
+    PhaseManager m_CurrentPhase;
+
     void Start()
     {
         Assert.IsNotNull(m_CameraAnchor);
@@ -41,6 +43,11 @@ public class Notamari : MonoBehaviour
         m_MovementTorque = m_MovementTorqueBase;
 
         SyncDebrisProperties();
+    }
+
+    public void SetPhaseManager(PhaseManager newManager)
+    {
+        m_CurrentPhase = newManager;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -77,10 +84,15 @@ public class Notamari : MonoBehaviour
 
                 // There is probably a faster way to do this but whatever there's like fifty pieces of debris per level at most
             }
+
+            if (m_CurrentPhase)
+            {
+                m_CurrentPhase.NotifyGrabbed();
+            }
         }
     }
 
-    // Called whenever children count changes
+    // Processes new colors, lighting, and shader parameters
     void SyncDebrisProperties()
     {
         float collectedPct = m_Children.Count / (float)m_DebrisTotal;

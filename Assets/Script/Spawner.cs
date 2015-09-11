@@ -8,7 +8,7 @@ public class Spawner : MonoBehaviour
 
     public Transform m_Debris;
 
-    void Start()
+    public void Spawn()
     {
         Collider spawnBounds = GetComponent<Collider>();
         Assert.IsNotNull(spawnBounds);
@@ -57,5 +57,4 @@ public class Spawner : MonoBehaviour
             Assert.IsTrue(emergencyEscape < emergencyEscapeThreshold);
         }
     }
-
 }
