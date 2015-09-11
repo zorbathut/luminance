@@ -19,7 +19,7 @@ public class Notamari : MonoBehaviour
     Rigidbody m_RigidBody;
     Renderer m_Renderer;
 
-    int m_DebrisTotal = 0;
+    int m_DebrisTotal = 1000;   // meaningless number meant to be "very large", just to avoid divide-by-zero on the first SyncDebrisProperties
     float m_LastCollectedPct = 0;
     Color m_LastDebrisColor = new Color();
 
@@ -37,17 +37,21 @@ public class Notamari : MonoBehaviour
         m_Renderer = GetComponent<Renderer>();
         Assert.IsNotNull(m_Renderer);
 
-        // this is not an elegant solution; it is a one-line and functional solution
-        m_DebrisTotal = FindObjectsOfType<Debris>().Length;
-
         m_MovementTorque = m_MovementTorqueBase;
 
         SyncDebrisProperties();
     }
 
-    public void SetPhaseManager(PhaseManager newManager)
+    public void SetPhaseManager(PhaseManager newManager, int debrisTotal)
     {
         m_CurrentPhase = newManager;
+        m_DebrisTotal = debrisTotal;
+        SyncDebrisProperties();
+    }
+
+    public int GetDebrisCount()
+    {
+        return m_Children.Count;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -87,7 +91,7 @@ public class Notamari : MonoBehaviour
 
             if (m_CurrentPhase)
             {
-                m_CurrentPhase.NotifyGrabbed();
+                m_CurrentPhase.NotifyGrabbed(this);
             }
         }
     }
