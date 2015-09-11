@@ -19,6 +19,7 @@ public class PhaseManager : MonoBehaviour
     public Text m_ContinueText;
 
     public Transform m_Shatter;
+    public float m_ShatterSize = 1;
 
     int m_DebrisTotal = 0;
     bool m_AllowRestart = false;
@@ -49,7 +50,7 @@ public class PhaseManager : MonoBehaviour
         if (m_Chain)
         {
             // Destroy all colliders that are involved in this phase
-            ShatterWorld(false);
+            ShatterWorld(false, notamari.transform.position);
 
             // Clear the notamari
             notamari.Empty();
@@ -59,7 +60,7 @@ public class PhaseManager : MonoBehaviour
         }
         else
         {
-            ShatterWorld(true);
+            ShatterWorld(true, notamari.transform.position);
 
             StartCoroutine(EndGameCutscene());
         }
@@ -103,7 +104,7 @@ public class PhaseManager : MonoBehaviour
     // Cutscenes
     //
 
-    void ShatterWorld(bool keepColliders)
+    void ShatterWorld(bool keepColliders, Vector3 epicenter)
     {
         foreach (Collider collider in transform.parent.GetComponentsInChildren<Collider>())
         {
@@ -112,7 +113,40 @@ public class PhaseManager : MonoBehaviour
                 Destroy(collider);
             }
 
-            Destroy(collider.GetComponent<Renderer>());
+            if (collider.GetComponent<Renderer>())
+            {
+                // Is visible, so let's break it into cubes
+
+                // Dunno how expensive this is, and we use it all over the place, so let's cache it
+                Vector3 scale = collider.transform.localScale;
+
+                int cubesX = Mathf.RoundToInt(scale.x / m_ShatterSize);
+                int cubesY = Mathf.RoundToInt(scale.y / m_ShatterSize);
+                int cubesZ = Mathf.RoundToInt(scale.z / m_ShatterSize);
+
+                // pointless microoptimization - do y's loop first because our objects tend to be flat
+                for (int ty = 0; ty < cubesY; ++ty)
+                {
+                    float ypos = (ty + 0.5f) / cubesY - 0.5f;
+                    for (int tx = 0; tx < cubesX; ++tx)
+                    {
+                        float xpos = (tx + 0.5f) / cubesX - 0.5f;
+                        for (int tz = 0; tz < cubesZ; ++tz)
+                        {
+                            float zpos = (tz + 0.5f) / cubesZ - 0.5f;
+                            Vector3 worldTarget = collider.transform.TransformPoint(new Vector3(xpos, ypos, zpos));
+                            Rigidbody shatter = ((Transform)Instantiate(m_Shatter, worldTarget, collider.transform.rotation)).GetComponent<Rigidbody>();
+
+                            // These are hardcoded because I would have had to change values in three different managers, which seemed silly for this project.
+                            shatter.AddExplosionForce(Util.NextGaussianClamp(1000, 200, 500, 1500), epicenter, 40);
+                            shatter.AddTorque(Random.rotation.eulerAngles * 10);
+                        }
+                    }
+                }
+
+                // but we really don't want the old one to render anymore
+                Destroy(collider.GetComponent<Renderer>());
+            }
         }
 
     }
