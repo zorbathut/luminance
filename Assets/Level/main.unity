@@ -426,6 +426,51 @@ MonoBehaviour:
   m_ContinueText: {fileID: 0}
   m_Shatter: {fileID: 442996, guid: 22fcadf7aa1071a41ae550267e0bd14b, type: 2}
   m_ShatterSize: 1
+  m_PCCutsceneHigh:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: -3.39795375
+      outSlope: -3.39795375
+      tangentMode: 0
+    - time: .5
+      value: .5
+      inSlope: -.0632269979
+      outSlope: -.0632269979
+      tangentMode: 0
+    - time: .699999988
+      value: .5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: .800000012
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+  m_PCCutsceneLow:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: .699999988
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: .800000012
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
 --- !u!65 &200445028
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -586,6 +631,51 @@ MonoBehaviour:
   m_ContinueText: {fileID: 1323942484}
   m_Shatter: {fileID: 442996, guid: 22fcadf7aa1071a41ae550267e0bd14b, type: 2}
   m_ShatterSize: 1
+  m_PCCutsceneHigh:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: -3.39795375
+      outSlope: -3.39795375
+      tangentMode: 0
+    - time: .5
+      value: .5
+      inSlope: -.0632269979
+      outSlope: -.0632269979
+      tangentMode: 0
+    - time: .699999988
+      value: .5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: .800000012
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+  m_PCCutsceneLow:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: .699999988
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: .800000012
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
 --- !u!1 &439121560
 GameObject:
   m_ObjectHideFlags: 0
@@ -1656,6 +1746,51 @@ MonoBehaviour:
   m_ContinueText: {fileID: 0}
   m_Shatter: {fileID: 442996, guid: 22fcadf7aa1071a41ae550267e0bd14b, type: 2}
   m_ShatterSize: 1
+  m_PCCutsceneHigh:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: -3.39795375
+      outSlope: -3.39795375
+      tangentMode: 0
+    - time: .5
+      value: .5
+      inSlope: -.0632269979
+      outSlope: -.0632269979
+      tangentMode: 0
+    - time: .699999988
+      value: .5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: .800000012
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+  m_PCCutsceneLow:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: .699999988
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: .800000012
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
 --- !u!224 &1003186389
 RectTransform:
   m_ObjectHideFlags: 0

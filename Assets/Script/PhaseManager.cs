@@ -21,6 +21,9 @@ public class PhaseManager : MonoBehaviour
     public Transform m_Shatter;
     public float m_ShatterSize = 1;
 
+    public AnimationCurve m_PCCutsceneHigh;
+    public AnimationCurve m_PCCutsceneLow;
+
     int m_DebrisTotal = 0;
     bool m_AllowRestart = false;
 
@@ -49,14 +52,7 @@ public class PhaseManager : MonoBehaviour
     {
         if (m_Chain)
         {
-            // Destroy all colliders that are involved in this phase
-            ShatterWorld(false, notamari.transform.position);
-
-            // Clear the notamari
-            notamari.Empty();
-
-            // Kick off the next segment
-            m_Chain.BeginPhase();
+            StartCoroutine(PhaseChangeCutscene(notamari));
         }
         else
         {
@@ -238,5 +234,52 @@ public class PhaseManager : MonoBehaviour
                 m_ContinueText.color = new Color(0, 0, 0, 1 - progress);
             }
         }
+    }
+
+
+    IEnumerator PhaseChangeCutscene(Notamari notamari)
+    {
+        // The phase change cutscene is (1) meant to be pretty, and (2) meant to disguise the framerate hitch caused by spawning a ton of physics items
+        // If I couldn't disguise the hitch like this I would probably have to generate physics items in stasis over a period of time, or generate them at level load, or something
+        // But I can!
+        // So I do.
+
+        // We're using animation curves here because the EndGameCutscene is way too ugly for me to be happy with.
+
+        float flashDuration = 0.05f;
+
+        ColorCorrectionCurves colorCurves = Camera.main.GetComponent<ColorCorrectionCurves>();
+        float startTime = Time.time;
+
+        while ((Time.time - startTime) < m_PCCutsceneLow[m_PCCutsceneLow.length - 1].time)
+        {
+            // yield goes first to guarantee we max out the animation
+            yield return 0;
+
+            AnimationCurve curve = AnimationCurve.Linear(0, m_PCCutsceneLow.Evaluate(Time.time - startTime), m_PCCutsceneHigh.Evaluate(Time.time - startTime), 1);
+
+            colorCurves.redChannel = curve;
+            colorCurves.greenChannel = curve;
+            colorCurves.blueChannel = curve;
+            colorCurves.UpdateParameters();
+        }
+
+        yield return new WaitForSeconds(flashDuration);
+
+        // Destroy all colliders that are involved in this phase
+        ShatterWorld(false, notamari.transform.position);
+
+        // Clear the notamari
+        notamari.Empty();
+
+        // Begin the next segment
+        m_Chain.BeginPhase();
+
+        // Reset colors
+        AnimationCurve origCurve = AnimationCurve.Linear(0, 0, 1, 1);
+        colorCurves.redChannel = origCurve;
+        colorCurves.greenChannel = origCurve;
+        colorCurves.blueChannel = origCurve;
+        colorCurves.UpdateParameters();
     }
 }
