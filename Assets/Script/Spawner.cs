@@ -23,7 +23,7 @@ public class Spawner : MonoBehaviour
         if (spawnBounds && debrisCollider)
         {
             int spawned = 0;
-            int emergencyEscape = 0;    // just to be sure we don't infinite-loop ourselves - this will be slow but it won't crash, and it's on startup anyway
+            int emergencyEscape = 0;    // just to be sure we don't infinite-loop ourselves - this will be slow but it won't crash, and it's on startup/during a phase change anyway
             int emergencyEscapeThreshold = m_Spawns * 100;
             while (spawned < m_Spawns && emergencyEscape++ < emergencyEscapeThreshold)
             {
@@ -40,14 +40,28 @@ public class Spawner : MonoBehaviour
                 }
 
                 // Trace down so we find where it should land
-                RaycastHit hitInfo;
-                if (!Physics.Raycast(position, Vector3.down * 10, out hitInfo))
+                RaycastHit[] hits = Physics.RaycastAll(position, Vector3.down);
+                Vector3 hitPoint = new Vector3();
+                float hitPointDistance = float.PositiveInfinity;
+
+                foreach (RaycastHit hit in hits)
                 {
+                    if (hit.collider.GetComponent<Renderer>() && hitPointDistance > hit.distance)
+                    {
+                        // Find the closest visible collider
+                        hitPointDistance = hit.distance;
+                        hitPoint = hit.point;
+                    }
+                }
+
+                if (hitPointDistance == float.PositiveInfinity)
+                {
+                    // Did not find any impact point; don't include this object!
                     continue;
                 }
 
                 // Place it there
-                Debris debris = ((Transform)Instantiate(m_Debris, hitInfo.point + Vector3.up * groundOffset, Random.rotationUniform)).GetComponent<Debris>();
+                Debris debris = ((Transform)Instantiate(m_Debris, hitPoint + Vector3.up * groundOffset, Random.rotationUniform)).GetComponent<Debris>();
                 ++spawned;
 
                 // Set up colors

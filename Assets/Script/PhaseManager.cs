@@ -116,9 +116,11 @@ public class PhaseManager : MonoBehaviour
                 // Dunno how expensive this is, and we use it all over the place, so let's cache it
                 Vector3 scale = collider.transform.localScale;
 
-                int cubesX = Mathf.RoundToInt(scale.x / m_ShatterSize);
-                int cubesY = Mathf.RoundToInt(scale.y / m_ShatterSize);
-                int cubesZ = Mathf.RoundToInt(scale.z / m_ShatterSize);
+                int cubesX = Mathf.Max(1, Mathf.RoundToInt(scale.x / m_ShatterSize));
+                int cubesY = Mathf.Max(1, Mathf.RoundToInt(scale.y / m_ShatterSize));
+                int cubesZ = Mathf.Max(1, Mathf.RoundToInt(scale.z / m_ShatterSize));
+
+                Vector3 targetSize = new Vector3(scale.x / cubesX, scale.y / cubesY, scale.z / cubesZ);
 
                 // pointless microoptimization - do y's loop first because our objects tend to be flat
                 for (int ty = 0; ty < cubesY; ++ty)
@@ -132,6 +134,7 @@ public class PhaseManager : MonoBehaviour
                             float zpos = (tz + 0.5f) / cubesZ - 0.5f;
                             Vector3 worldTarget = collider.transform.TransformPoint(new Vector3(xpos, ypos, zpos));
                             Rigidbody shatter = ((Transform)Instantiate(m_Shatter, worldTarget, collider.transform.rotation)).GetComponent<Rigidbody>();
+                            shatter.transform.localScale = targetSize;
 
                             // These are hardcoded because I would have had to change values in three different managers, which seemed silly for this project.
                             shatter.AddExplosionForce(Util.NextGaussianClamp(1000, 200, 500, 1500), epicenter, 40);
