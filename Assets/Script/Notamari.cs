@@ -14,6 +14,10 @@ public class Notamari : MonoBehaviour
     public float m_CollectedPctPower = 0.5f;
     public float m_VisualsLerp = 0.05f;
 
+    public List<AudioClip> m_Sounds;
+    int m_SoundLast = -1;
+    int m_SoundLastPrev = -1;
+
     float m_MovementTorque;
 
     Rigidbody m_RigidBody;
@@ -96,6 +100,18 @@ public class Notamari : MonoBehaviour
 
                 // There is probably a faster way to do this but whatever there's like fifty pieces of debris per level at most
             }
+
+            int sound = -1;
+            do {
+                sound = Random.Range(0, m_Sounds.Count);
+            } while (sound == m_SoundLast || sound == m_SoundLastPrev);
+            m_SoundLastPrev = m_SoundLast;
+            m_SoundLast = sound;
+
+            // Sound!
+            AudioSource source = debris.GetComponent<AudioSource>();
+            source.clip = m_Sounds[sound];
+            source.Play();
 
             if (m_CurrentPhase)
             {
