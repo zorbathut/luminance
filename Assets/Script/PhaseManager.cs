@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 // This is kind of the "level" manager - each section is handled mostly independently. It's not really "level" because that has its own meaning in Unity, though, so I kinda had to invent a term.
+// In retrospect I'm pretty sure "phase" was not the right term.
 public class PhaseManager : MonoBehaviour
 {
     public List<Spawner> m_Spawners;
@@ -56,9 +57,7 @@ public class PhaseManager : MonoBehaviour
         }
         else
         {
-            ShatterWorld(true, notamari.transform.position);
-
-            StartCoroutine(EndGameCutscene());
+            StartCoroutine(EndGameCutscene(notamari));
         }
     }
 
@@ -106,6 +105,7 @@ public class PhaseManager : MonoBehaviour
         {
             if (!keepColliders && !collider.isTrigger)
             {
+                // Get rid of the collision on this phase; triggers aren't really collisions and we need them to clear the phase manager properly anyway
                 Destroy(collider);
             }
 
@@ -116,10 +116,12 @@ public class PhaseManager : MonoBehaviour
                 // Dunno how expensive this is, and we use it all over the place, so let's cache it
                 Vector3 scale = collider.transform.localScale;
 
+                // Calculate cube count
                 int cubesX = Mathf.Max(1, Mathf.RoundToInt(scale.x / m_ShatterSize));
                 int cubesY = Mathf.Max(1, Mathf.RoundToInt(scale.y / m_ShatterSize));
                 int cubesZ = Mathf.Max(1, Mathf.RoundToInt(scale.z / m_ShatterSize));
 
+                // Calculate cube target sizes
                 Vector3 targetSize = new Vector3(scale.x / cubesX, scale.y / cubesY, scale.z / cubesZ);
 
                 // pointless microoptimization - do y's loop first because our objects tend to be flat
@@ -132,33 +134,37 @@ public class PhaseManager : MonoBehaviour
                         for (int tz = 0; tz < cubesZ; ++tz)
                         {
                             float zpos = (tz + 0.5f) / cubesZ - 0.5f;
+
+                            // Figure out world position of the cube we're building
                             Vector3 worldTarget = collider.transform.TransformPoint(new Vector3(xpos, ypos, zpos));
+
                             Rigidbody shatter = ((Transform)Instantiate(m_Shatter, worldTarget, collider.transform.rotation)).GetComponent<Rigidbody>();
                             shatter.transform.localScale = targetSize;
 
-                            // These are hardcoded because I would have had to change values in three different managers, which seemed silly for this project.
+                            // Make 'em move! These are hardcoded because I would have had to change values in three different managers, which seemed silly for this project.
                             shatter.AddExplosionForce(Util.NextGaussianClamp(1000, 200, 500, 1500), epicenter, 40);
-                            shatter.AddTorque(Random.rotation.eulerAngles * 10);
+                            shatter.AddTorque(Random.rotation.eulerAngles * 10); // spinning things are pretty
                         }
                     }
                 }
 
-                // but we really don't want the old one to render anymore
+                // but we really don't want the old one to render anymore, so get rid of that
                 Destroy(collider.GetComponent<Renderer>());
             }
         }
 
     }
-        
+
+    // this is basically Mathf.Pow, except it leaves the sign alone
     float Intensify(float value, float power)
     {
-        // this is basically Mathf.Pow, except it leaves the sign alone
         return Mathf.Pow(Mathf.Abs(value), power) * Mathf.Sign(value);
     }
 
-    IEnumerator EndGameCutscene()
+    IEnumerator EndGameCutscene(Notamari notamari)
     {
         // This is all pretty hacked-together, I just don't want to try putting it in a state machine
+        // IN RETROSPECT this is terrible and I did a better job on the next function
         Camera camera = Camera.main;
         ColorCorrectionCurves colorCurves = camera.GetComponent<ColorCorrectionCurves>();
 
@@ -168,6 +174,8 @@ public class PhaseManager : MonoBehaviour
         float successTime = 2f;
         float successDelayTime = 1.2f;
         float continueTime = 2f;
+
+        ShatterWorld(true, notamari.transform.position);
 
         yield return new WaitForSeconds(preDelayTime);
 
@@ -249,7 +257,7 @@ public class PhaseManager : MonoBehaviour
 
         // We're using animation curves here because the EndGameCutscene is way too ugly for me to be happy with.
 
-        float flashDuration = 0.05f;
+        float flashDuration = 0.2f; // FUN FACT: smaller flash durations felt like a framerate hitch, even though half the purpose was to disguise framerate hitches. welp
 
         ColorCorrectionCurves colorCurves = Camera.main.GetComponent<ColorCorrectionCurves>();
         float startTime = Time.time;

@@ -2,6 +2,7 @@
 using UnityEngine.Assertions;
 using System.Collections;
 
+// Pickup-able class - manages its own glow and not a lot more
 public class Debris : MonoBehaviour
 {
     Light m_Light;

@@ -2,6 +2,7 @@
 using UnityEngine.Assertions;
 using System.Collections;
 
+// Debris spawner. Places debris on surfaces so it doesn't roll around awkwardly.
 public class Spawner : MonoBehaviour
 {
     public int m_Spawns;
@@ -17,11 +18,15 @@ public class Spawner : MonoBehaviour
         Collider debrisCollider = m_Debris.GetComponent<Collider>();
         Assert.IsNotNull(debrisCollider);
 
-        // this is hacky and will cause things to levitate; fix it later
+        // this is a hacky way of figuring out how high off the ground things should be. seems to work though
         float groundOffset = (debrisCollider.bounds.max - debrisCollider.bounds.min).magnitude;
 
         if (spawnBounds && debrisCollider)
         {
+            // The original plan for this loop was that I'd be able to put it around pits and stuff and it would still place the right number of debris elements
+            // Then I never ended up making any pits
+            // Whoops
+            // So I guess this entire bit of complexity is useless. Should probably take it out just for bug prevention, but I'm leaving it for posterity :V
             int spawned = 0;
             int emergencyEscape = 0;    // just to be sure we don't infinite-loop ourselves - this will be slow but it won't crash, and it's on startup/during a phase change anyway
             int emergencyEscapeThreshold = m_Spawns * 100;

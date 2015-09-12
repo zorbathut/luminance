@@ -21,6 +21,7 @@ static class Util
         return u * fac;
     }
 
+    // like gaussian, but with built-in offset/variance and with a min/max
     public static float NextGaussianClamp(float offset, float variance, float min, float max)
     {
         Assert.IsTrue(min <= max);

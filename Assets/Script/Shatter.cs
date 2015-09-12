@@ -2,6 +2,7 @@
 using UnityEngine.Assertions;
 using System.Collections;
 
+// Destroyed pieces of level. The purpose of this is basically to lerp out after a period of time.
 public class Shatter : MonoBehaviour
 {
     public float m_LifetimeBase = 3f;

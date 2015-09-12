@@ -2,32 +2,43 @@
 using UnityEngine.Assertions;
 using System.Collections.Generic;
 
+// Not a Katamari. Get it? Notamari? Yeah not the most inspired naming ever.
+// Player class, handles all player-entity-specific game logic.
 public class Notamari : MonoBehaviour
 {
     public Transform m_CameraAnchor;
     public Transform m_CentralLightsource;
 
+    // Movement tuning
     public float m_MovementTorqueBase = 10f;
     public float m_MovementTorquePerDebris = 0.5f;
+
+    // Collision addition tuning
     public float m_SphereAbsorption = 2f;
     public float m_SphereExpansion = 2f;
+
+    // Visuals tuning
     public float m_CollectedPctPower = 0.5f;
     public float m_VisualsLerp = 0.05f;
 
+    // Audio
     public List<AudioClip> m_Sounds;
     int m_SoundLast = -1;
     int m_SoundLastPrev = -1;
 
-    float m_MovementTorque;
-
     Rigidbody m_RigidBody;
     Renderer m_Renderer;
 
+    // Stored from the current active phase; this is kind of ugly
     int m_DebrisTotal = 1000;   // meaningless number meant to be "very large", just to avoid divide-by-zero on the first SyncDebrisProperties
+
+    // Stored to lerp visuals
     float m_LastCollectedPct = 0;
     Color m_LastDebrisColor = new Color();
 
     List<Debris> m_Children = new List<Debris>();
+
+    float m_MovementTorque;
 
     PhaseManager m_CurrentPhase;
 
@@ -55,6 +66,7 @@ public class Notamari : MonoBehaviour
 
     public void UnsetPhaseManager(PhaseManager oldManager)
     {
+        // Unset only if we're actually leaving the current phase
         if (m_CurrentPhase == oldManager)
         {
             m_CurrentPhase = null;
@@ -66,10 +78,11 @@ public class Notamari : MonoBehaviour
         return m_Children.Count;
     }
 
+    // Entire purpose of this is to pick up debris
     void OnCollisionEnter(Collision collision)
     {
         Debris debris = collision.gameObject.GetComponent<Debris>();
-        if (debris && debris.transform.parent != transform)
+        if (debris && debris.transform.parent != transform) // Extra test to make sure we haven't already picked it up and are colliding with another element!
         {
             m_Children.Add(debris);
 
@@ -101,6 +114,7 @@ public class Notamari : MonoBehaviour
                 // There is probably a faster way to do this but whatever there's like fifty pieces of debris per level at most
             }
 
+            // Pick a new random sound we haven't recently played
             int sound = -1;
             do {
                 sound = Random.Range(0, m_Sounds.Count);
@@ -108,11 +122,12 @@ public class Notamari : MonoBehaviour
             m_SoundLastPrev = m_SoundLast;
             m_SoundLast = sound;
 
-            // Sound!
+            // Play it!
             AudioSource source = debris.GetComponent<AudioSource>();
             source.clip = m_Sounds[sound];
             source.Play();
 
+            // Update the phase if necessary (it should be necessary!)
             if (m_CurrentPhase)
             {
                 m_CurrentPhase.NotifyGrabbed(this);
@@ -137,8 +152,7 @@ public class Notamari : MonoBehaviour
         // Update our physics; without this, it gets really hard to move
         m_MovementTorque = m_MovementTorqueBase + m_MovementTorquePerDebris * m_Children.Count;
 
-        // Update children and accumulate lighting
-        // The accumulated lighting snaps to the new color, and it probably shouldn't, but it's not likely to be visible
+        // Update children intensity and accumulate lighting color
         Color debrisColor = new Color();
         foreach (Debris debris in m_Children)
         {
@@ -176,7 +190,7 @@ public class Notamari : MonoBehaviour
             }
         }
 
-        // Finally, if we've collected everything, get rid of all our child colliders so the sphere runs smoothly
+        // Finally, if we've collected everything, get rid of all our child colliders so the sphere runs smoothly (for like the next three seconds but it was distracting before I did this)
         if (m_Children.Count == m_DebrisTotal)
         {
             foreach (Debris debris in m_Children)
@@ -197,6 +211,7 @@ public class Notamari : MonoBehaviour
 
     void FixedUpdate()
     {
+        // This is what moves the sphere
         m_RigidBody.AddTorque(new Vector3(Input.GetAxis("Vertical"), 0, -Input.GetAxis("Horizontal")) * m_MovementTorque);
 
         // Technically this should be in Update(), but then the math to make the lerp work properly is a lot more difficult, and nobody will notice it *only* updating at 60fps
@@ -210,6 +225,7 @@ public class Notamari : MonoBehaviour
             // Move the camera along with the sphere; it's not a child of the sphere so we don't have to muck about with undoing rotations
             float targetY = transform.position.y;
 
+            // If we're in a phase, we lock the camera to the phase's vertical position so that slopes and bumps look correct
             if (m_CurrentPhase)
             {
                 targetY = m_CurrentPhase.transform.position.y;
